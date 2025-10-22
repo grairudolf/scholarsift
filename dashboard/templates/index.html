@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarSift - Smart Scholarship Discovery</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .scholarship-card {
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .scholarship-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        .deadline-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .funding-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .filter-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .loading {
+            display: none;
+        }
+        .scholarship-description {
+            max-height: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .scholarship-description.expanded {
+            max-height: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-graduation-cap"></i> ScholarSift
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#scholarships">Scholarships</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#subscribe">Subscribe</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="text-center mb-4">
+                    <h1><i class="fas fa-graduation-cap text-primary"></i> ScholarSift</h1>
+                    <p class="text-muted">Discover scholarships, grants, and educational opportunities worldwide</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filter-section">
+            <h5><i class="fas fa-filter"></i> Filter Scholarships</h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="countryFilter" class="form-label">Country</label>
+                    <select class="form-select" id="countryFilter">
+                        <option value="">All Countries</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="degreeFilter" class="form-label">Degree Level</label>
+                    <select class="form-select" id="degreeFilter">
+                        <option value="">All Levels</option>
+                        <option value="undergraduate">Undergraduate</option>
+                        <option value="masters">Master's</option>
+                        <option value="phd">PhD</option>
+                        <option value="postdoc">Postdoc</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="fundingFilter" class="form-label">Funding Type</label>
+                    <select class="form-select" id="fundingFilter">
+                        <option value="">All Types</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="gpaFilter" class="form-label">Min GPA</label>
+                    <input type="number" class="form-control" id="gpaFilter" min="0" max="4" step="0.1" placeholder="e.g., 3.0">
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label for="deadlineFilter" class="form-label">Deadline (within days)</label>
+                    <select class="form-select" id="deadlineFilter">
+                        <option value="">Any Time</option>
+                        <option value="30">Next 30 days</option>
+                        <option value="60">Next 2 months</option>
+                        <option value="90">Next 3 months</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">&nbsp;</label>
+                    <div>
+                        <button class="btn btn-primary me-2" id="applyFilters">
+                            <i class="fas fa-search"></i> Apply Filters
+                        </button>
+                        <button class="btn btn-secondary" id="clearFilters">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Scholarships <span class="badge bg-primary" id="resultsCount">0</span></h5>
+                    <div class="loading" id="loadingSpinner">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div> Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scholarships Grid -->
+        <div class="row" id="scholarshipsGrid">
+            <!-- Scholarships will be loaded here -->
+        </div>
+
+        <!-- No Results Message -->
+        <div class="text-center mt-5" id="noResults" style="display: none;">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No scholarships found</h5>
+            <p class="text-muted">Try adjusting your filters or check back later for new opportunities.</p>
+        </div>
+
+        <!-- Subscription Modal -->
+        <div class="modal fade" id="subscribeModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><i class="fas fa-bell"></i> Subscribe to Updates</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="subscribeForm">
+                            <div class="mb-3">
+                                <label for="emailInput" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="emailInput" placeholder="your.email@example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label for="telegramInput" class="form-label">Telegram Username (optional)</label>
+                                <input type="text" class="form-control" id="telegramInput" placeholder="@yourusername">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Preferences</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="prefWeekly" checked>
+                                    <label class="form-check-label" for="prefWeekly">
+                                        Weekly digest of new scholarships
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="prefUrgent" checked>
+                                    <label class="form-check-label" for="prefUrgent">
+                                        Urgent deadlines (closing within 2 weeks)
+                                    </label>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="submitSubscription">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scholarship Detail Modal -->
+    <div class="modal fade" id="scholarshipModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="scholarshipModalTitle">Scholarship Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="scholarshipModalBody">
+                    <!-- Content will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let scholarships = [];
+        let filteredScholarships = [];
+
+        // Load scholarships on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadScholarships();
+            loadFilterOptions();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            document.getElementById('applyFilters').addEventListener('click', applyFilters);
+            document.getElementById('clearFilters').addEventListener('click', clearFilters);
+            document.getElementById('submitSubscription').addEventListener('click', submitSubscription);
+
+            // Show subscription modal
+            document.querySelector('a[href="#subscribe"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                new bootstrap.Modal(document.getElementById('subscribeModal')).show();
+            });
+        }
+
+        async function loadScholarships() {
+            showLoading(true);
+            try {
+                const response = await fetch('/api/scholarships');
+                scholarships = await response.json();
+                filteredScholarships = [...scholarships];
+                displayScholarships(filteredScholarships);
+                updateResultsCount();
+            } catch (error) {
+                console.error('Error loading scholarships:', error);
+                showNoResults();
+            }
+            showLoading(false);
+        }
+
+        async function loadFilterOptions() {
+            try {
+                // Load countries
+                const countriesResponse = await fetch('/api/countries');
+                const countries = await countriesResponse.json();
+                const countrySelect = document.getElementById('countryFilter');
+                countries.forEach(country => {
+                    const option = document.createElement('option');
+                    option.value = country;
+                    option.textContent = country;
+                    countrySelect.appendChild(option);
+                });
+
+                // Load funding types
+                const fundingResponse = await fetch('/api/funding-types');
+                const fundingTypes = await fundingResponse.json();
+                const fundingSelect = document.getElementById('fundingFilter');
+                fundingTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    fundingSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading filter options:', error);
+            }
+        }
+
+        function applyFilters() {
+            const country = document.getElementById('countryFilter').value;
+            const degree = document.getElementById('degreeFilter').value;
+            const funding = document.getElementById('fundingFilter').value;
+            const gpa = document.getElementById('gpaFilter').value;
+            const deadline = document.getElementById('deadlineFilter').value;
+
+            filteredScholarships = scholarships.filter(scholarship => {
+                if (country && (!scholarship.country || !scholarship.country.toLowerCase().includes(country.toLowerCase()))) {
+                    return false;
+                }
+                if (degree && scholarship.degree_level !== degree) {
+                    return false;
+                }
+                if (funding && scholarship.funding_type !== funding) {
+                    return false;
+                }
+                if (gpa && (!scholarship.gpa_requirement || scholarship.gpa_requirement < parseFloat(gpa))) {
+                    return false;
+                }
+                if (deadline) {
+                    const deadlineDate = new Date(scholarship.deadline);
+                    const now = new Date();
+                    const daysDiff = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+                    if (daysDiff > parseInt(deadline)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            displayScholarships(filteredScholarships);
+            updateResultsCount();
+        }
+
+        function clearFilters() {
+            document.getElementById('countryFilter').value = '';
+            document.getElementById('degreeFilter').value = '';
+            document.getElementById('fundingFilter').value = '';
+            document.getElementById('gpaFilter').value = '';
+            document.getElementById('deadlineFilter').value = '';
+            filteredScholarships = [...scholarships];
+            displayScholarships(filteredScholarships);
+            updateResultsCount();
+        }
+
+        function displayScholarships(scholarships) {
+            const grid = document.getElementById('scholarshipsGrid');
+            const noResults = document.getElementById('noResults');
+
+            if (scholarships.length === 0) {
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            grid.innerHTML = scholarships.map(scholarship => `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card scholarship-card position-relative" onclick="showScholarshipDetail(${scholarship.id})">
+                        <div class="card-body">
+                            <div class="funding-badge">
+                                <span class="badge bg-success">${scholarship.funding_type?.replace('_', ' ') || 'Funding'}</span>
+                            </div>
+                            ${scholarship.deadline ? `
+                                <div class="deadline-badge">
+                                    <span class="badge bg-warning text-dark">
+                                        ${new Date(scholarship.deadline).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            ` : ''}
+                            <h5 class="card-title">${scholarship.name}</h5>
+                            ${scholarship.country ? `<p class="text-muted mb-2"><i class="fas fa-globe"></i> ${scholarship.country}</p>` : ''}
+                            ${scholarship.degree_level ? `<p class="text-muted mb-2"><i class="fas fa-graduation-cap"></i> ${scholarship.degree_level}</p>` : ''}
+                            ${scholarship.gpa_requirement ? `<p class="text-muted mb-2"><i class="fas fa-chart-line"></i> GPA: ${scholarship.gpa_requirement}</p>` : ''}
+                            <p class="card-text scholarship-description">
+                                ${scholarship.summary || scholarship.description?.substring(0, 150) + '...' || 'No description available'}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-external-link-alt"></i> ${scholarship.source_name}
+                                </small>
+                                <a href="${scholarship.application_link}" target="_blank" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation()">
+                                    Apply <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function showScholarshipDetail(id) {
+            try {
+                const response = await fetch(`/api/scholarships/${id}`);
+                const scholarship = await response.json();
+
+                if (response.ok) {
+                    const modal = new bootstrap.Modal(document.getElementById('scholarshipModal'));
+                    document.getElementById('scholarshipModalTitle').textContent = scholarship.name;
+                    document.getElementById('scholarshipModalBody').innerHTML = `
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6>Details</h6>
+                                <p><strong>Country:</strong> ${scholarship.country || 'Not specified'}</p>
+                                <p><strong>Degree Level:</strong> ${scholarship.degree_level || 'Not specified'}</p>
+                                <p><strong>Funding Type:</strong> ${scholarship.funding_type?.replace('_', ' ') || 'Not specified'}</p>
+                                ${scholarship.gpa_requirement ? `<p><strong>GPA Requirement:</strong> ${scholarship.gpa_requirement}</p>` : ''}
+                                ${scholarship.deadline ? `<p><strong>Deadline:</strong> ${new Date(scholarship.deadline).toLocaleDateString()}</p>` : ''}
+                                <p><strong>Source:</strong> <a href="${scholarship.source_url}" target="_blank">${scholarship.source_name}</a></p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>Application</h6>
+                                <a href="${scholarship.application_link}" target="_blank" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-external-link-alt"></i> Apply Now
+                                </a>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <h6>Description</h6>
+                            <p>${scholarship.description || 'No description available'}</p>
+                        </div>
+                        ${scholarship.eligibility ? `
+                            <div class="mt-3">
+                                <h6>Eligibility Requirements</h6>
+                                <p>${scholarship.eligibility}</p>
+                            </div>
+                        ` : ''}
+                    `;
+                    modal.show();
+                }
+            } catch (error) {
+                console.error('Error loading scholarship details:', error);
+            }
+        }
+
+        async function submitSubscription() {
+            const email = document.getElementById('emailInput').value;
+            const telegram = document.getElementById('telegramInput').value;
+            const prefWeekly = document.getElementById('prefWeekly').checked;
+            const prefUrgent = document.getElementById('prefUrgent').checked;
+
+            if (!email && !telegram) {
+                alert('Please provide either an email address or Telegram username');
+                return;
+            }
+
+            const preferences = {
+                weekly: prefWeekly,
+                urgent: prefUrgent
+            };
+
+            try {
+                const response = await fetch('/api/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        telegram_id: telegram,
+                        preferences: preferences
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Successfully subscribed! You will receive updates about new scholarships.');
+                    bootstrap.Modal.getInstance(document.getElementById('subscribeModal')).hide();
+                    document.getElementById('subscribeForm').reset();
+                } else {
+                    alert('Error subscribing: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error subscribing:', error);
+                alert('Error subscribing. Please try again.');
+            }
+        }
+
+        function showLoading(show) {
+            const spinner = document.getElementById('loadingSpinner');
+            spinner.style.display = show ? 'inline-block' : 'none';
+        }
+
+        function updateResultsCount() {
+            document.getElementById('resultsCount').textContent = filteredScholarships.length;
+        }
+
+        function showNoResults() {
+            document.getElementById('scholarshipsGrid').innerHTML = '';
+            document.getElementById('noResults').style.display = 'block';
+            document.getElementById('resultsCount').textContent = '0';
+        }
+    </script>
+</body>
+</html>

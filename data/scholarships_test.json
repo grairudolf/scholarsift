@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Test Scholarship 1",
+    "country": "Germany",
+    "degree_level": "masters",
+    "funding_type": "fully_funded",
+    "deadline": "2024-12-31",
+    "application_link": "https://example.com/apply1"
+  },
+  {
+    "id": 2,
+    "name": "Test Scholarship 2",
+    "country": "UK",
+    "degree_level": "phd",
+    "funding_type": "partial",
+    "deadline": "2024-11-15",
+    "application_link": "https://example.com/apply2"
+  }
+]
