@@ -1,22 +1,38 @@
 import os
-import openai
-from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
-import torch
+try:
+    import openai
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+
+try:
+    from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
+    import torch
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+
 from config import Config
 
 class ScholarshipSummarizer:
     def __init__(self):
         self.openai_api_key = Config.OPENAI_API_KEY
-        self.use_openai = bool(self.openai_api_key)
+        self.use_openai = bool(self.openai_api_key) and OPENAI_AVAILABLE
+        self.use_transformers = TRANSFORMERS_AVAILABLE
 
         if self.use_openai:
             openai.api_key = self.openai_api_key
-        else:
+        elif self.use_transformers:
             # Use local model as fallback
             self.setup_local_model()
+        else:
+            print("⚠️  No AI summarization available - install openai or transformers package")
 
     def setup_local_model(self):
         """Setup local summarization model"""
+        if not self.use_transformers:
+            return
+
         try:
             model_name = "facebook/bart-large-cnn"
             self.tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -37,6 +53,9 @@ class ScholarshipSummarizer:
 
     def summarize_with_openai(self, text, max_length=150):
         """Summarize text using OpenAI"""
+        if not OPENAI_AVAILABLE:
+            return self.fallback_summary(text)
+
         try:
             prompt = f"Please summarize the following scholarship opportunity in {max_length} words or less, focusing on key benefits, eligibility requirements, and application process:\n\n{text}"
 
@@ -56,10 +75,10 @@ class ScholarshipSummarizer:
 
     def summarize_with_local_model(self, text, max_length=150):
         """Summarize text using local transformer model"""
-        try:
-            if not self.summarizer:
-                return self.fallback_summary(text)
+        if not self.use_transformers or not self.summarizer:
+            return self.fallback_summary(text)
 
+        try:
             # Truncate text if too long
             max_input_length = 1024
             if len(text) > max_input_length:
@@ -101,8 +120,10 @@ class ScholarshipSummarizer:
 
         if self.use_openai:
             return self.summarize_with_openai(text, max_length)
-        else:
+        elif self.use_transformers:
             return self.summarize_with_local_model(text, max_length)
+        else:
+            return self.fallback_summary(text)
 
     def batch_summarize(self, scholarships):
         """Summarize multiple scholarships"""

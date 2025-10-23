@@ -1,9 +1,23 @@
+import sys
+import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_cors import CORS
 import json
 from datetime import datetime, timedelta
+
+# Add parent directory to path for imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from database import DatabaseManager
-from summarizer import ScholarshipSummarizer
+
+# Try to import summarizer, fallback if not available
+try:
+    from summarizer import ScholarshipSummarizer
+    SUMMARIZER_AVAILABLE = True
+except ImportError as e:
+    print(f"⚠️  Summarizer not available: {e}")
+    SUMMARIZER_AVAILABLE = False
+    ScholarshipSummarizer = None
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -11,7 +25,7 @@ CORS(app)
 
 # Initialize database and summarizer
 db = DatabaseManager()
-summarizer = ScholarshipSummarizer()
+summarizer = ScholarshipSummarizer() if SUMMARIZER_AVAILABLE else None
 
 @app.route('/')
 def index():
@@ -94,7 +108,7 @@ def get_scholarship(scholarship_id):
         'source_url': scholarship.source_url,
         'source_name': scholarship.source_name,
         'scraped_at': scholarship.scraped_at.isoformat(),
-        'summary': scholarship.summary or summarizer.summarize_scholarship(scholarship.description or '')
+        'summary': scholarship.summary or (summarizer.summarize_scholarship(scholarship.description or '') if summarizer else scholarship.description[:200] + '...' if scholarship.description else '')
     }
 
     return jsonify(scholarship_data)
