@@ -4,52 +4,491 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ScholarSift - Smart Scholarship Discovery</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="icon" href="../icon.png">
     <style>
-        .scholarship-card {
-            transition: transform 0.2s;
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+            --shadow-lg: 0 8px 16px rgba(0,0,0,0.2);
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: var(--primary-gradient) !important;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .hero-section {
+            background: var(--primary-gradient);
+            padding: 4rem 0 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-title {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
             border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
-        .scholarship-card:hover {
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-gradient);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: #7f8c8d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.875rem;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .filter-title {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-title i {
+            color: #667eea;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e1e8ed;
+            padding: 0.75rem 1rem;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            box-shadow: var(--shadow-md);
         }
+
+        .btn-outline-secondary {
+            border: 2px solid #e1e8ed;
+            color: #6c757d;
+            background: white;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-outline-secondary:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .scholarship-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .scholarship-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .scholarship-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .scholarship-title {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        .scholarship-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .meta-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meta-badge.country {
+            background: var(--primary-gradient);
+        }
+
+        .meta-badge.degree {
+            background: var(--success-gradient);
+        }
+
+        .meta-badge.funding {
+            background: var(--warning-gradient);
+        }
+
+        .meta-badge.deadline {
+            background: var(--danger-gradient);
+        }
+
         .deadline-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 1rem;
+            right: 1rem;
+            background: var(--danger-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
+
         .funding-badge {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 1rem;
+            left: 1rem;
+            background: var(--success-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
-        .filter-section {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+
+        .scholarship-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1rem;
         }
+
         .loading {
             display: none;
+            text-align: center;
+            padding: 3rem;
         }
-        .scholarship-description {
-            max-height: 100px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
         }
-        .scholarship-description.expanded {
-            max-height: none;
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+        }
+
+        .no-results i {
+            font-size: 4rem;
+            color: #bdc3c7;
+            margin-bottom: 1rem;
+        }
+
+        .no-results h5 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .no-results p {
+            color: #7f8c8d;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        .search-box input {
+            padding-left: 3rem;
+            border-radius: 25px;
+            border: 2px solid #e1e8ed;
+        }
+
+        .search-box input:focus {
+            border-color: #667eea;
+        }
+
+        .gpa-slider {
+            margin: 2rem 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .range-input {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            cursor: pointer;
+        }
+
+        .range-input::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            cursor: pointer;
+            border: none;
+        }
+
+        .subscription-modal .modal-content {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .subscription-modal .modal-header {
+            background: var(--primary-gradient);
+            color: white;
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            border: none;
+        }
+
+        .subscription-modal .modal-title {
+            font-weight: 700;
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .filter-section {
+                padding: 1.5rem;
+            }
+
+            .scholarship-card {
+                padding: 1rem;
+            }
+
+            .scholarship-meta {
+                gap: 0.5rem;
+            }
+
+            .meta-badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.5rem;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+        }
+
+        .results-header {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .sort-select {
+            border-radius: 8px;
+            border: 2px solid #e1e8ed;
+            padding: 0.5rem 1rem;
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="fas fa-graduation-cap"></i> ScholarSift
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                ScholarSift
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -57,204 +496,350 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#scholarships">Scholarships</a>
+                        <a class="nav-link" href="#scholarships">
+                            <i class="fas fa-search me-1"></i>Scholarships
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#subscribe">Subscribe</a>
+                        <a class="nav-link" href="#about">
+                            <i class="fas fa-info-circle me-1"></i>About
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#about">About</a>
+                        <a class="nav-link" href="#" id="subscribeNav">
+                            <i class="fas fa-bell me-1"></i>Subscribe
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <div class="container mt-4">
-        <div class="row">
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="hero-title fade-in">
+                        <i class="fas fa-graduation-cap text-warning me-3"></i>
+                        ScholarSift
+                    </h1>
+                    <p class="hero-subtitle fade-in">
+                        Discover your dream scholarship with AI-powered search and filtering.
+                        Find opportunities tailored to your profile from trusted sources worldwide.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mt-4 fade-in">
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="totalScholarships">0</div>
+                        <div class="stats-label">Total Scholarships</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="countriesCount">0</div>
+                        <div class="stats-label">Countries</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="fullyFundedCount">0</div>
+                        <div class="stats-label">Fully Funded</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stats-card">
+                        <div class="stats-number" id="urgentCount">0</div>
+                        <div class="stats-label">Urgent Deadlines</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <!-- Search Section -->
+        <div class="row mb-4">
             <div class="col-12">
-                <div class="text-center mb-4">
-                    <h1><i class="fas fa-graduation-cap text-primary"></i> ScholarSift</h1>
-                    <p class="text-muted">Discover scholarships, grants, and educational opportunities worldwide</p>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control form-control-lg" id="searchInput" placeholder="Search scholarships by name, country, or description...">
                 </div>
             </div>
         </div>
 
         <!-- Filters Section -->
-        <div class="filter-section">
-            <h5><i class="fas fa-filter"></i> Filter Scholarships</h5>
+        <div class="filter-section fade-in">
+            <h5 class="filter-title">
+                <i class="fas fa-filter"></i>
+                Advanced Filters
+            </h5>
             <div class="row">
                 <div class="col-md-3">
-                    <label for="countryFilter" class="form-label">Country</label>
+                    <label for="countryFilter" class="form-label fw-bold">Country</label>
                     <select class="form-select" id="countryFilter">
-                        <option value="">All Countries</option>
+                        <option value="">🌍 All Countries</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="degreeFilter" class="form-label">Degree Level</label>
+                    <label for="degreeFilter" class="form-label fw-bold">Degree Level</label>
                     <select class="form-select" id="degreeFilter">
-                        <option value="">All Levels</option>
-                        <option value="undergraduate">Undergraduate</option>
-                        <option value="masters">Master's</option>
-                        <option value="phd">PhD</option>
-                        <option value="postdoc">Postdoc</option>
+                        <option value="">🎓 All Levels</option>
+                        <option value="undergraduate">📚 Undergraduate</option>
+                        <option value="masters">🎯 Master's</option>
+                        <option value="phd">🔬 PhD</option>
+                        <option value="postdoc">📖 Postdoc</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="fundingFilter" class="form-label">Funding Type</label>
+                    <label for="fundingFilter" class="form-label fw-bold">Funding Type</label>
                     <select class="form-select" id="fundingFilter">
-                        <option value="">All Types</option>
+                        <option value="">💰 All Types</option>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="gpaFilter" class="form-label">Min GPA</label>
-                    <input type="number" class="form-control" id="gpaFilter" min="0" max="4" step="0.1" placeholder="e.g., 3.0">
+                    <label for="deadlineFilter" class="form-label fw-bold">Deadline</label>
+                    <select class="form-select" id="deadlineFilter">
+                        <option value="">⏰ Any Time</option>
+                        <option value="30">🔥 Next 30 days</option>
+                        <option value="60">⚡ Next 2 months</option>
+                        <option value="90">📅 Next 3 months</option>
+                    </select>
                 </div>
             </div>
+
+            <!-- GPA Slider -->
             <div class="row mt-3">
                 <div class="col-md-6">
-                    <label for="deadlineFilter" class="form-label">Deadline (within days)</label>
-                    <select class="form-select" id="deadlineFilter">
-                        <option value="">Any Time</option>
-                        <option value="30">Next 30 days</option>
-                        <option value="60">Next 2 months</option>
-                        <option value="90">Next 3 months</option>
-                    </select>
+                    <label class="form-label fw-bold">Minimum GPA Requirement</label>
+                    <div class="gpa-slider">
+                        <div class="slider-label">
+                            <span>2.0</span>
+                            <span id="gpaValue">3.0</span>
+                            <span>4.0</span>
+                        </div>
+                        <input type="range" class="range-input" id="gpaSlider" min="2.0" max="4.0" step="0.1" value="3.0">
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">&nbsp;</label>
+                <div class="col-md-6 d-flex align-items-end">
                     <div>
                         <button class="btn btn-primary me-2" id="applyFilters">
-                            <i class="fas fa-search"></i> Apply Filters
+                            <i class="fas fa-search me-2"></i>Apply Filters
                         </button>
-                        <button class="btn btn-secondary" id="clearFilters">
-                            <i class="fas fa-times"></i> Clear
+                        <button class="btn btn-outline-secondary" id="clearFilters">
+                            <i class="fas fa-times me-2"></i>Clear All
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5>Scholarships <span class="badge bg-primary" id="resultsCount">0</span></h5>
-                    <div class="loading" id="loadingSpinner">
-                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div> Loading...
-                    </div>
+        <!-- Results Header -->
+        <div class="results-header fade-in">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">
+                        <i class="fas fa-graduation-cap text-primary me-2"></i>
+                        Scholarships
+                        <span class="badge bg-primary ms-2" id="resultsCount">0</span>
+                    </h5>
+                </div>
+                <div class="sort-controls">
+                    <label for="sortSelect" class="form-label mb-0 me-2 fw-bold">Sort by:</label>
+                    <select class="form-select sort-select" id="sortSelect">
+                        <option value="deadline">⏰ Deadline</option>
+                        <option value="name">🔤 Name</option>
+                        <option value="country">🌍 Country</option>
+                        <option value="funding">💰 Funding</option>
+                    </select>
                 </div>
             </div>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div class="loading" id="loadingSpinner">
+            <div class="loading-spinner"></div>
+            <h5 class="text-primary">Finding scholarships...</h5>
+            <p class="text-muted">This may take a few moments</p>
         </div>
 
         <!-- Scholarships Grid -->
-        <div class="row" id="scholarshipsGrid">
-            <!-- Scholarships will be loaded here -->
-        </div>
+        <div class="row" id="scholarshipsGrid"></div>
 
         <!-- No Results Message -->
-        <div class="text-center mt-5" id="noResults" style="display: none;">
-            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-            <h5 class="text-muted">No scholarships found</h5>
-            <p class="text-muted">Try adjusting your filters or check back later for new opportunities.</p>
+        <div class="no-results fade-in" id="noResults" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h5>No scholarships found</h5>
+            <p>Try adjusting your filters or search terms to find more opportunities.</p>
+            <button class="btn btn-primary" id="clearFiltersNoResults">
+                <i class="fas fa-times me-2"></i>Clear Filters
+            </button>
         </div>
 
         <!-- Subscription Modal -->
-        <div class="modal fade" id="subscribeModal" tabindex="-1">
-            <div class="modal-dialog">
+        <div class="modal fade subscription-modal" id="subscribeModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title"><i class="fas fa-bell"></i> Subscribe to Updates</h5>
+                        <h5 class="modal-title">
+                            <i class="fas fa-bell me-2"></i>
+                            Subscribe to Scholarship Updates
+                        </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="subscribeForm">
-                            <div class="mb-3">
-                                <label for="emailInput" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="emailInput" placeholder="your.email@example.com">
-                            </div>
-                            <div class="mb-3">
-                                <label for="telegramInput" class="form-label">Telegram Username (optional)</label>
-                                <input type="text" class="form-control" id="telegramInput" placeholder="@yourusername">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Preferences</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="prefWeekly" checked>
-                                    <label class="form-check-label" for="prefWeekly">
-                                        Weekly digest of new scholarships
-                                    </label>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-gift me-2"></i>
+                                    Get Personalized Updates
+                                </h6>
+                                <p class="text-muted">
+                                    Never miss a scholarship opportunity! Get weekly digests and urgent deadline alerts
+                                    tailored to your preferences.
+                                </p>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="prefWeekly" checked>
+                                        <label class="form-check-label fw-bold" for="prefWeekly">
+                                            📧 Weekly scholarship digest
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="prefUrgent" checked>
+                                        <label class="form-check-label fw-bold" for="prefUrgent">
+                                            🚨 Urgent deadline alerts
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="prefCustom" checked>
+                                        <label class="form-check-label fw-bold" for="prefCustom">
+                                            🎯 Personalized recommendations
+                                        </label>
+                                    </div>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="prefUrgent" checked>
-                                    <label class="form-check-label" for="prefUrgent">
-                                        Urgent deadlines (closing within 2 weeks)
-                                    </label>
-                                </div>
                             </div>
-                        </form>
+                            <div class="col-md-6">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    Contact Information
+                                </h6>
+                                <form id="subscribeForm">
+                                    <div class="mb-3">
+                                        <label for="emailInput" class="form-label fw-bold">Email Address</label>
+                                        <input type="email" class="form-control" id="emailInput" placeholder="your.email@example.com" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="telegramInput" class="form-label fw-bold">Telegram Username (optional)</label>
+                                        <input type="text" class="form-control" id="telegramInput" placeholder="@yourusername">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Preferred Countries</label>
+                                        <select class="form-select" id="countryPreference" multiple>
+                                            <option value="Germany">🇩🇪 Germany</option>
+                                            <option value="UK">🇬🇧 United Kingdom</option>
+                                            <option value="USA">🇺🇸 United States</option>
+                                            <option value="Australia">🇦🇺 Australia</option>
+                                            <option value="Canada">🇨🇦 Canada</option>
+                                            <option value="Netherlands">🇳🇱 Netherlands</option>
+                                            <option value="Sweden">🇸🇪 Sweden</option>
+                                            <option value="Switzerland">🇨🇭 Switzerland</option>
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="submitSubscription">Subscribe</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" id="submitSubscription">
+                            <i class="fas fa-bell me-2"></i>Subscribe Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scholarship Detail Modal -->
+        <div class="modal fade" id="scholarshipModal" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="scholarshipModalTitle">Scholarship Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="scholarshipModalBody">
+                        <!-- Content will be loaded here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scholarship Detail Modal -->
-    <div class="modal fade" id="scholarshipModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="scholarshipModalTitle">Scholarship Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="scholarshipModalBody">
-                    <!-- Content will be loaded here -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let scholarships = [];
         let filteredScholarships = [];
+        let currentFilters = {};
 
         // Load scholarships on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadScholarships();
             loadFilterOptions();
             setupEventListeners();
+            updateStats();
         });
 
         function setupEventListeners() {
             document.getElementById('applyFilters').addEventListener('click', applyFilters);
             document.getElementById('clearFilters').addEventListener('click', clearFilters);
+            document.getElementById('clearFiltersNoResults').addEventListener('click', clearFilters);
             document.getElementById('submitSubscription').addEventListener('click', submitSubscription);
-
-            // Show subscription modal
-            document.querySelector('a[href="#subscribe"]').addEventListener('click', function(e) {
+            document.getElementById('subscribeNav').addEventListener('click', function(e) {
                 e.preventDefault();
                 new bootstrap.Modal(document.getElementById('subscribeModal')).show();
             });
+            document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 500));
+            document.getElementById('sortSelect').addEventListener('change', function() {
+                applyFilters();
+            });
+            document.getElementById('gpaSlider').addEventListener('input', function() {
+                document.getElementById('gpaValue').textContent = this.value;
+                applyFilters();
+            });
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
         async function loadScholarships() {
             showLoading(true);
             try {
                 const response = await fetch('/api/scholarships');
+                if (!response.ok) throw new Error('Failed to load scholarships');
                 scholarships = await response.json();
                 filteredScholarships = [...scholarships];
                 displayScholarships(filteredScholarships);
                 updateResultsCount();
+                updateStats();
             } catch (error) {
                 console.error('Error loading scholarships:', error);
-                showNoResults();
+                showNoResults('Failed to load scholarships. Please try again later.');
             }
             showLoading(false);
         }
@@ -268,7 +853,7 @@
                 countries.forEach(country => {
                     const option = document.createElement('option');
                     option.value = country;
-                    option.textContent = country;
+                    option.textContent = `🇻🇬 ${country}`;
                     countrySelect.appendChild(option);
                 });
 
@@ -279,7 +864,8 @@
                 fundingTypes.forEach(type => {
                     const option = document.createElement('option');
                     option.value = type;
-                    option.textContent = type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    const emoji = type === 'fully_funded' ? '💰' : type === 'partial' ? '💸' : '🏆';
+                    option.textContent = `${emoji} ${type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}`;
                     fundingSelect.appendChild(option);
                 });
             } catch (error) {
@@ -288,25 +874,50 @@
         }
 
         function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const country = document.getElementById('countryFilter').value;
             const degree = document.getElementById('degreeFilter').value;
             const funding = document.getElementById('fundingFilter').value;
-            const gpa = document.getElementById('gpaFilter').value;
             const deadline = document.getElementById('deadlineFilter').value;
+            const gpa = parseFloat(document.getElementById('gpaSlider').value);
+            const sortBy = document.getElementById('sortSelect').value;
+
+            currentFilters = { country, degree, funding, deadline, gpa, searchTerm, sortBy };
 
             filteredScholarships = scholarships.filter(scholarship => {
+                // Search filter
+                if (searchTerm) {
+                    const searchFields = [
+                        scholarship.name,
+                        scholarship.description,
+                        scholarship.country,
+                        scholarship.university,
+                        scholarship.eligibility
+                    ].join(' ').toLowerCase();
+                    if (!searchFields.includes(searchTerm)) return false;
+                }
+
+                // Country filter
                 if (country && (!scholarship.country || !scholarship.country.toLowerCase().includes(country.toLowerCase()))) {
                     return false;
                 }
+
+                // Degree level filter
                 if (degree && scholarship.degree_level !== degree) {
                     return false;
                 }
+
+                // Funding type filter
                 if (funding && scholarship.funding_type !== funding) {
                     return false;
                 }
-                if (gpa && (!scholarship.gpa_requirement || scholarship.gpa_requirement < parseFloat(gpa))) {
+
+                // GPA filter
+                if (gpa && (!scholarship.gpa_requirement || scholarship.gpa_requirement < gpa)) {
                     return false;
                 }
+
+                // Deadline filter
                 if (deadline) {
                     const deadlineDate = new Date(scholarship.deadline);
                     const now = new Date();
@@ -315,7 +926,27 @@
                         return false;
                     }
                 }
+
                 return true;
+            });
+
+            // Sort results
+            filteredScholarships.sort((a, b) => {
+                switch (sortBy) {
+                    case 'deadline':
+                        if (!a.deadline) return 1;
+                        if (!b.deadline) return -1;
+                        return new Date(a.deadline) - new Date(b.deadline);
+                    case 'name':
+                        return a.name.localeCompare(b.name);
+                    case 'country':
+                        return (a.country || '').localeCompare(b.country || '');
+                    case 'funding':
+                        const fundingOrder = { 'fully_funded': 0, 'partial': 1, 'stipend': 2, 'other': 3 };
+                        return (fundingOrder[a.funding_type] || 4) - (fundingOrder[b.funding_type] || 4);
+                    default:
+                        return 0;
+                }
             });
 
             displayScholarships(filteredScholarships);
@@ -323,11 +954,16 @@
         }
 
         function clearFilters() {
+            document.getElementById('searchInput').value = '';
             document.getElementById('countryFilter').value = '';
             document.getElementById('degreeFilter').value = '';
             document.getElementById('fundingFilter').value = '';
-            document.getElementById('gpaFilter').value = '';
             document.getElementById('deadlineFilter').value = '';
+            document.getElementById('gpaSlider').value = '3.0';
+            document.getElementById('gpaValue').textContent = '3.0';
+            document.getElementById('sortSelect').value = 'deadline';
+
+            currentFilters = {};
             filteredScholarships = [...scholarships];
             displayScholarships(filteredScholarships);
             updateResultsCount();
@@ -339,45 +975,78 @@
 
             if (scholarships.length === 0) {
                 grid.innerHTML = '';
-                noResults.style.display = 'block';
+                showNoResults('No scholarships match your criteria. Try adjusting your filters.');
                 return;
             }
 
             noResults.style.display = 'none';
 
-            grid.innerHTML = scholarships.map(scholarship => `
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card scholarship-card position-relative" onclick="showScholarshipDetail(${scholarship.id})">
-                        <div class="card-body">
-                            <div class="funding-badge">
-                                <span class="badge bg-success">${scholarship.funding_type?.replace('_', ' ') || 'Funding'}</span>
+            grid.innerHTML = scholarships.map((scholarship, index) => `
+                <div class="col-lg-6 col-xl-4 mb-4">
+                    <div class="scholarship-card fade-in" style="animation-delay: ${index * 0.1}s" onclick="showScholarshipDetail(${scholarship.id})">
+                        <div class="funding-badge">
+                            ${getFundingIcon(scholarship.funding_type)}
+                        </div>
+                        ${scholarship.deadline ? `
+                            <div class="deadline-badge ${isUrgent(scholarship.deadline) ? 'pulse' : ''}">
+                                ${formatDeadline(scholarship.deadline)}
                             </div>
-                            ${scholarship.deadline ? `
-                                <div class="deadline-badge">
-                                    <span class="badge bg-warning text-dark">
-                                        ${new Date(scholarship.deadline).toLocaleDateString()}
-                                    </span>
-                                </div>
-                            ` : ''}
-                            <h5 class="card-title">${scholarship.name}</h5>
-                            ${scholarship.country ? `<p class="text-muted mb-2"><i class="fas fa-globe"></i> ${scholarship.country}</p>` : ''}
-                            ${scholarship.degree_level ? `<p class="text-muted mb-2"><i class="fas fa-graduation-cap"></i> ${scholarship.degree_level}</p>` : ''}
-                            ${scholarship.gpa_requirement ? `<p class="text-muted mb-2"><i class="fas fa-chart-line"></i> GPA: ${scholarship.gpa_requirement}</p>` : ''}
-                            <p class="card-text scholarship-description">
-                                ${scholarship.summary || scholarship.description?.substring(0, 150) + '...' || 'No description available'}
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
-                                    <i class="fas fa-external-link-alt"></i> ${scholarship.source_name}
-                                </small>
-                                <a href="${scholarship.application_link}" target="_blank" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation()">
-                                    Apply <i class="fas fa-arrow-right"></i>
-                                </a>
-                            </div>
+                        ` : ''}
+                        <h5 class="scholarship-title">${scholarship.name}</h5>
+                        <div class="scholarship-meta">
+                            ${scholarship.country ? `<span class="meta-badge country">🌍 ${scholarship.country}</span>` : ''}
+                            ${scholarship.degree_level ? `<span class="meta-badge degree">🎓 ${scholarship.degree_level}</span>` : ''}
+                            ${scholarship.funding_type ? `<span class="meta-badge funding">${getFundingIcon(scholarship.funding_type)} ${formatFundingType(scholarship.funding_type)}</span>` : ''}
+                            ${scholarship.gpa_requirement ? `<span class="meta-badge">📊 GPA ${scholarship.gpa_requirement}+</span>` : ''}
+                        </div>
+                        <p class="scholarship-description">
+                            ${scholarship.summary || scholarship.description?.substring(0, 150) + '...' || 'No description available'}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-external-link-alt me-1"></i>
+                                ${scholarship.source_name}
+                            </small>
+                            <a href="${scholarship.application_link}" target="_blank" class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation()">
+                                <i class="fas fa-arrow-right me-1"></i>Apply
+                            </a>
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function getFundingIcon(fundingType) {
+            switch (fundingType) {
+                case 'fully_funded': return '💰';
+                case 'partial': return '💸';
+                case 'stipend': return '💵';
+                default: return '🏆';
+            }
+        }
+
+        function formatFundingType(fundingType) {
+            return fundingType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function isUrgent(deadline) {
+            const deadlineDate = new Date(deadline);
+            const now = new Date();
+            const daysDiff = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+            return daysDiff <= 30;
+        }
+
+        function formatDeadline(deadline) {
+            const deadlineDate = new Date(deadline);
+            const now = new Date();
+            const daysDiff = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+
+            if (daysDiff < 0) return 'EXPIRED';
+            if (daysDiff === 0) return 'TODAY';
+            if (daysDiff === 1) return 'TOMORROW';
+            if (daysDiff <= 7) return `${daysDiff} DAYS`;
+            if (daysDiff <= 30) return `${Math.ceil(daysDiff / 7)} WEEKS`;
+            return deadlineDate.toLocaleDateString();
         }
 
         async function showScholarshipDetail(id) {
@@ -387,40 +1056,99 @@
 
                 if (response.ok) {
                     const modal = new bootstrap.Modal(document.getElementById('scholarshipModal'));
-                    document.getElementById('scholarshipModalTitle').textContent = scholarship.name;
+                    document.getElementById('scholarshipModalTitle').innerHTML = `
+                        <i class="fas fa-graduation-cap text-primary me-2"></i>
+                        ${scholarship.name}
+                    `;
+
                     document.getElementById('scholarshipModalBody').innerHTML = `
                         <div class="row">
-                            <div class="col-md-8">
-                                <h6>Details</h6>
-                                <p><strong>Country:</strong> ${scholarship.country || 'Not specified'}</p>
-                                <p><strong>Degree Level:</strong> ${scholarship.degree_level || 'Not specified'}</p>
-                                <p><strong>Funding Type:</strong> ${scholarship.funding_type?.replace('_', ' ') || 'Not specified'}</p>
-                                ${scholarship.gpa_requirement ? `<p><strong>GPA Requirement:</strong> ${scholarship.gpa_requirement}</p>` : ''}
-                                ${scholarship.deadline ? `<p><strong>Deadline:</strong> ${new Date(scholarship.deadline).toLocaleDateString()}</p>` : ''}
-                                <p><strong>Source:</strong> <a href="${scholarship.source_url}" target="_blank">${scholarship.source_name}</a></p>
+                            <div class="col-lg-8">
+                                <div class="mb-4">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>Overview
+                                    </h6>
+                                    <div class="d-flex flex-wrap gap-2 mb-3">
+                                        ${scholarship.country ? `<span class="badge bg-primary">🌍 ${scholarship.country}</span>` : ''}
+                                        ${scholarship.degree_level ? `<span class="badge bg-success">🎓 ${scholarship.degree_level}</span>` : ''}
+                                        ${scholarship.funding_type ? `<span class="badge bg-warning text-dark">${getFundingIcon(scholarship.funding_type)} ${formatFundingType(scholarship.funding_type)}</span>` : ''}
+                                        ${scholarship.gpa_requirement ? `<span class="badge bg-info">📊 GPA ${scholarship.gpa_requirement}+</span>` : ''}
+                                    </div>
+                                    ${scholarship.deadline ? `
+                                        <div class="alert alert-${isUrgent(scholarship.deadline) ? 'danger' : 'warning'} d-flex align-items-center">
+                                            <i class="fas fa-clock me-2"></i>
+                                            <strong>Deadline: ${new Date(scholarship.deadline).toLocaleDateString()}</strong>
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                <div class="mb-4">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-book-open me-2"></i>Description
+                                    </h6>
+                                    <p class="text-muted">${scholarship.description || 'No description available'}</p>
+                                </div>
+
+                                ${scholarship.eligibility ? `
+                                    <div class="mb-4">
+                                        <h6 class="text-primary mb-3">
+                                            <i class="fas fa-check-circle me-2"></i>Eligibility Requirements
+                                        </h6>
+                                        <div class="bg-light p-3 rounded">${scholarship.eligibility}</div>
+                                    </div>
+                                ` : ''}
+
+                                <div class="mb-4">
+                                    <h6 class="text-primary mb-3">
+                                        <i class="fas fa-link me-2"></i>Application
+                                    </h6>
+                                    <div class="d-grid gap-2">
+                                        <a href="${scholarship.application_link}" target="_blank" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-external-link-alt me-2"></i>Apply Now
+                                        </a>
+                                        <a href="${scholarship.source_url}" target="_blank" class="btn btn-outline-secondary">
+                                            <i class="fas fa-globe me-2"></i>Visit Source Website
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <h6>Application</h6>
-                                <a href="${scholarship.application_link}" target="_blank" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-external-link-alt"></i> Apply Now
-                                </a>
+
+                            <div class="col-lg-4">
+                                <div class="bg-light p-3 rounded mb-3">
+                                    <h6 class="text-primary mb-2">
+                                        <i class="fas fa-calendar me-2"></i>Timeline
+                                    </h6>
+                                    <p class="mb-1"><strong>Posted:</strong> ${new Date(scholarship.scraped_at).toLocaleDateString()}</p>
+                                    ${scholarship.deadline ? `<p class="mb-1"><strong>Deadline:</strong> ${new Date(scholarship.deadline).toLocaleDateString()}</p>` : ''}
+                                </div>
+
+                                <div class="bg-light p-3 rounded mb-3">
+                                    <h6 class="text-primary mb-2">
+                                        <i class="fas fa-university me-2"></i>Provider
+                                    </h6>
+                                    <p class="mb-1"><strong>Source:</strong> ${scholarship.source_name}</p>
+                                    <a href="${scholarship.source_url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-external-link-alt me-1"></i>Visit Website
+                                    </a>
+                                </div>
+
+                                ${scholarship.university ? `
+                                    <div class="bg-light p-3 rounded mb-3">
+                                        <h6 class="text-primary mb-2">
+                                            <i class="fas fa-building me-2"></i>University
+                                        </h6>
+                                        <p class="mb-0">${scholarship.university}</p>
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <h6>Description</h6>
-                            <p>${scholarship.description || 'No description available'}</p>
-                        </div>
-                        ${scholarship.eligibility ? `
-                            <div class="mt-3">
-                                <h6>Eligibility Requirements</h6>
-                                <p>${scholarship.eligibility}</p>
-                            </div>
-                        ` : ''}
                     `;
+
                     modal.show();
                 }
             } catch (error) {
                 console.error('Error loading scholarship details:', error);
+                alert('Error loading scholarship details. Please try again.');
             }
         }
 
@@ -429,6 +1157,8 @@
             const telegram = document.getElementById('telegramInput').value;
             const prefWeekly = document.getElementById('prefWeekly').checked;
             const prefUrgent = document.getElementById('prefUrgent').checked;
+            const prefCustom = document.getElementById('prefCustom').checked;
+            const countryPrefs = Array.from(document.getElementById('countryPreference').selectedOptions).map(option => option.value);
 
             if (!email && !telegram) {
                 alert('Please provide either an email address or Telegram username');
@@ -437,7 +1167,9 @@
 
             const preferences = {
                 weekly: prefWeekly,
-                urgent: prefUrgent
+                urgent: prefUrgent,
+                custom: prefCustom,
+                countries: countryPrefs
             };
 
             try {
@@ -456,31 +1188,44 @@
                 const result = await response.json();
 
                 if (response.ok) {
-                    alert('Successfully subscribed! You will receive updates about new scholarships.');
+                    alert('✅ Successfully subscribed! You\'ll receive updates about new scholarships.');
                     bootstrap.Modal.getInstance(document.getElementById('subscribeModal')).hide();
                     document.getElementById('subscribeForm').reset();
                 } else {
-                    alert('Error subscribing: ' + result.error);
+                    alert('❌ Error subscribing: ' + result.error);
                 }
             } catch (error) {
                 console.error('Error subscribing:', error);
-                alert('Error subscribing. Please try again.');
+                alert('❌ Error subscribing. Please try again.');
             }
         }
 
         function showLoading(show) {
             const spinner = document.getElementById('loadingSpinner');
-            spinner.style.display = show ? 'inline-block' : 'none';
+            spinner.style.display = show ? 'block' : 'none';
+        }
+
+        function showNoResults(message = 'No scholarships found') {
+            document.getElementById('scholarshipsGrid').innerHTML = '';
+            document.getElementById('noResults').style.display = 'block';
+            document.querySelector('#noResults p').textContent = message;
+            document.getElementById('resultsCount').textContent = '0';
         }
 
         function updateResultsCount() {
             document.getElementById('resultsCount').textContent = filteredScholarships.length;
         }
 
-        function showNoResults() {
-            document.getElementById('scholarshipsGrid').innerHTML = '';
-            document.getElementById('noResults').style.display = 'block';
-            document.getElementById('resultsCount').textContent = '0';
+        function updateStats() {
+            const total = scholarships.length;
+            const countries = new Set(scholarships.map(s => s.country).filter(Boolean)).size;
+            const fullyFunded = scholarships.filter(s => s.funding_type === 'fully_funded').length;
+            const urgent = scholarships.filter(s => s.deadline && isUrgent(s.deadline)).length;
+
+            document.getElementById('totalScholarships').textContent = total;
+            document.getElementById('countriesCount').textContent = countries;
+            document.getElementById('fullyFundedCount').textContent = fullyFunded;
+            document.getElementById('urgentCount').textContent = urgent;
         }
     </script>
 </body>

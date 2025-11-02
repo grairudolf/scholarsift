@@ -155,8 +155,7 @@ class NotificationManager:
             return
 
         # Get all subscriptions
-        subscriptions = self.db.get_scholarships()  # This should be a method to get subscriptions
-        # Note: We need to add a method to database.py to get subscriptions
+        subscriptions = self.db.get_subscriptions()
 
         subject = f"ScholarSift Weekly Digest - {len(new_scholarships)} New Scholarships!"
         html_content = self.generate_html_digest(new_scholarships, "Weekly Scholarship Digest")
@@ -195,7 +194,7 @@ class NotificationManager:
         telegram_message = self.generate_telegram_message(urgent_scholarships, urgent=True)
 
         # Get subscriptions that want urgent notifications
-        subscriptions = self.db.get_scholarships()  # This needs to be implemented properly
+        subscriptions = self.db.get_subscriptions()
 
         email_count = 0
         telegram_count = 0
@@ -242,12 +241,3 @@ class NotificationManager:
 
         message += "Visit our website for more details and filtering options."
         return message
-
-# Add this method to DatabaseManager class in database.py
-def get_subscriptions(self):
-    """Get all subscriptions"""
-    session = self.Session()
-    try:
-        return session.query(Subscription).all()
-    finally:
-        session.close()

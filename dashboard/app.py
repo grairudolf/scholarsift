@@ -78,7 +78,7 @@ def get_scholarships():
             'source_url': scholarship.source_url,
             'source_name': scholarship.source_name,
             'scraped_at': scholarship.scraped_at.isoformat(),
-            'summary': scholarship.summary or summarizer.summarize_scholarship(scholarship.description or '')
+            'summary': scholarship.summary or (summarizer.summarize_scholarship(scholarship.description or '') if summarizer else (scholarship.description[:200] + '...' if scholarship.description else ''))
         }
         result.append(scholarship_data)
 
